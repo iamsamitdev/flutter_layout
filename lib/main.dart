@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_layout/screens/bottomnav/account_screen.dart';
+import 'package:flutter_layout/screens/bottomnav/home_screen.dart';
+import 'package:flutter_layout/screens/bottomnav/news_screen.dart';
+import 'package:flutter_layout/screens/bottomnav/notification_screen.dart';
+import 'package:flutter_layout/screens/bottomnav/report_screen.dart';
+import 'package:flutter_layout/screens/drawermenu/cancel_account_screen.dart';
+import 'package:flutter_layout/screens/drawermenu/setting_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -23,20 +30,55 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
+  // สร้างตัวแปรแบบ list เก็บรายการหน้าของ tab bottom
+  int _currentIndex = 0;
+  String _title = 'หน้าหลัก';
+
+  List<Widget> _children = [
+    HomeScreen(),
+    NewsScreen(),
+    NotificationScreen(),
+    ReportScreen(),
+    AccountScreen()
+  ];
+
+  // เขียนเงื่อนไขเพื่อสลับเปลี่ยน Tab
+  void onTabTapped(int index){
+    setState(() {
+      _currentIndex = index;
+      switch (index) {
+        case 0:
+          _title = 'หน้าหลัก';
+          break;
+        case 1:
+          _title = 'ข่าวสาร';
+          break;
+        case 2:
+          _title = 'แจ้งเตือน';
+          break;
+        case 3:
+          _title = 'รายงาน';
+          break;
+        case 4:
+          _title = 'บัญชี';
+          break;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Home'),
+        title: Text('$_title'),
         actions: [
           IconButton(icon: Icon(Icons.notifications), onPressed: () {}),
           IconButton(icon: Icon(Icons.email), onPressed: () {}),
           IconButton(icon: Icon(Icons.camera), onPressed: () {})
         ],
       ),
-      body: Center(
-        child: Text('Welcome'),
-      ),
+      body: _children[_currentIndex],
       drawer: SafeArea(
           child: Drawer(
         child: ListView(
@@ -54,19 +96,28 @@ class _HomePageState extends State<HomePage> {
                       fit: BoxFit.fill)),
             ),
             ListTile(
-              leading: Icon(Icons.home),
-              title: Text('หน้าหลัก'),
-              onTap: () {},
+              leading: Icon(Icons.settings),
+              title: Text('ตั้งค่าระบบ'),
+              onTap: () {
+                // การเปลี่ยนไปหน้า Setting
+                Navigator.push(context, 
+                MaterialPageRoute(
+                  builder: (context) => SettingScreen()
+                  )
+                );
+              },
             ),
             ListTile(
-              leading: Icon(Icons.new_releases),
-              title: Text('ข่าวสาร'),
-              onTap: () {},
-            ),
-            ListTile(
-              leading: Icon(Icons.account_box),
-              title: Text('บัญชีผู้ใช้'),
-              onTap: () {},
+              leading: Icon(Icons.account_circle),
+              title: Text('ยกเลิกบัญชี'),
+              onTap: () {
+                // การเปลี่ยนไปหน้า CancelAccount
+                Navigator.push(context, 
+                MaterialPageRoute(
+                  builder: (context) => CancelAccountScreen()
+                  )
+                );
+              },
             ),
             ListTile(
               leading: Icon(Icons.exit_to_app),
@@ -79,8 +130,9 @@ class _HomePageState extends State<HomePage> {
       ),
 
       bottomNavigationBar: BottomNavigationBar(
+        onTap: onTabTapped,
         backgroundColor: Colors.teal,
-        currentIndex: 0,
+        currentIndex: _currentIndex,
         type: BottomNavigationBarType.fixed,
         items: <BottomNavigationBarItem> [
           BottomNavigationBarItem(
